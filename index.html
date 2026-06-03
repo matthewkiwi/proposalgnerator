@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Robot.com Proposals</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--black:#000;--white:#fff;--yellow:#fff65d;--gray-light:#f8f6f3;--gray-mid:#e8e7e5;--gray-dark:#cac9c6;--gray-text:#5c5b58;--font:Arial,sans-serif}
+body{font-family:var(--font);background:#f4f3f0;color:var(--black);min-height:100vh}
+
+/* ---- NAV ---- */
+nav{background:var(--black);padding:0 32px;display:flex;align-items:center;gap:0;height:52px;position:sticky;top:0;z-index:100}
+.nav-logo{display:flex;align-items:center;gap:10px;margin-right:32px}
+.nav-logo-mark{width:28px;height:28px;background:var(--yellow);border-radius:4px;display:flex;align-items:center;justify-content:center}
+.nav-logo-mark svg{width:18px;height:18px;fill:var(--black)}
+.nav-brand{font-size:13px;font-weight:700;color:var(--white);letter-spacing:0.08em}
+.nav-tabs{display:flex;gap:0;flex:1}
+.nav-tab{background:none;border:none;color:#888780;font-size:13px;font-family:var(--font);padding:0 18px;height:52px;cursor:pointer;border-bottom:2px solid transparent;transition:color .15s,border-color .15s}
+.nav-tab:hover{color:var(--white)}
+.nav-tab.active{color:var(--yellow);border-bottom-color:var(--yellow)}
+.nav-logout{background:none;border:0.5px solid #333;border-radius:4px;color:#888780;font-size:12px;font-family:var(--font);padding:5px 12px;cursor:pointer;margin-left:auto}
+.nav-logout:hover{color:var(--white);border-color:#666}
+
+/* ---- LOGIN ---- */
+#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:#000}
+.login-card{background:#111;border:0.5px solid #222;border-radius:12px;padding:48px 40px;width:360px;text-align:center}
+.login-logo{width:52px;height:52px;background:var(--yellow);border-radius:8px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px}
+.login-logo svg{width:32px;height:32px;fill:var(--black)}
+.login-card h1{font-size:20px;color:var(--white);margin-bottom:6px}
+.login-card p{font-size:13px;color:#888780;margin-bottom:28px}
+.login-card input{width:100%;background:#1a1a1a;border:0.5px solid #333;border-radius:6px;padding:10px 14px;font-size:14px;color:var(--white);font-family:var(--font);outline:none;margin-bottom:14px;transition:border-color .15s}
+.login-card input:focus{border-color:var(--yellow)}
+.login-card button{width:100%;background:var(--yellow);color:var(--black);border:none;border-radius:6px;padding:11px;font-size:14px;font-weight:700;font-family:var(--font);cursor:pointer;letter-spacing:0.04em}
+.login-card button:hover{opacity:.9}
+.login-error{font-size:12px;color:#e74c3c;margin-top:8px;display:none}
+
+/* ---- LAYOUT ---- */
+#app{display:none}
+.page{display:none;padding:32px;max-width:800px;margin:0 auto}
+.page.active{display:block}
+
+/* ---- SECTIONS ---- */
+.section{background:var(--white);border:0.5px solid var(--gray-mid);border-radius:10px;padding:20px;margin-bottom:16px}
+.section-label{font-size:10px;font-weight:700;color:var(--gray-text);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:14px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font-size:12px;color:var(--gray-text);font-weight:500}
+.field input,.field select,.field textarea{font-size:13px;color:var(--black);background:#fafafa;border:0.5px solid #ddd;border-radius:6px;padding:7px 10px;width:100%;outline:none;font-family:var(--font);transition:border-color .15s}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--black);background:var(--white)}
+.field textarea{resize:vertical;min-height:72px;line-height:1.5}
+.pfx{position:relative}.pfx input{padding-left:20px}.pfx span{position:absolute;left:9px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--gray-text);pointer-events:none}
+
+/* ---- OPTION CARDS ---- */
+.opt-card{border:0.5px solid var(--gray-mid);border-radius:8px;padding:16px;margin-bottom:10px;background:var(--gray-light)}
+.opt-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.opt-badge{background:var(--black);color:var(--yellow);font-size:11px;font-weight:700;border-radius:4px;padding:2px 8px;letter-spacing:0.04em}
+.btn-remove{background:transparent;border:0.5px solid #ddd;border-radius:5px;padding:4px 10px;font-size:11px;color:var(--gray-text);cursor:pointer;font-family:var(--font)}
+.btn-remove:hover{border-color:#e74c3c;color:#e74c3c}
+.btn-add-opt{background:transparent;border:0.5px solid #ddd;border-radius:6px;padding:9px 16px;font-size:13px;color:var(--black);cursor:pointer;font-family:var(--font);width:100%;margin-top:4px;transition:background .15s}
+.btn-add-opt:hover{background:var(--gray-light)}
+
+/* ---- SUMMARY ---- */
+.summary{background:var(--black);border-radius:10px;padding:20px;margin-bottom:16px}
+.summary-lbl{font-size:10px;font-weight:700;color:#888780;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:14px}
+.summary-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:0.5px solid #1a1a1a}
+.summary-key{font-size:12px;color:#888780}
+.summary-val{font-size:13px;font-weight:500;color:var(--white)}
+.summary-opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:10px;margin-top:14px}
+.sopt{background:#111;border-radius:7px;padding:12px}
+.sopt-title{font-size:10px;font-weight:700;color:#888780;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px}
+.sopt-row{display:flex;justify-content:space-between;padding:3px 0;border-bottom:0.5px solid #1e1e1e}
+.sopt-row:last-of-type{border-bottom:none}
+.sopt-key{font-size:11px;color:#888780}.sopt-val{font-size:11px;font-weight:500;color:var(--white)}
+.sopt-price{font-size:18px;font-weight:700;color:var(--yellow);margin-top:8px}
+
+/* ---- BUTTONS ---- */
+.actions{display:flex;gap:10px;margin-top:4px;flex-wrap:wrap}
+.btn-primary{background:var(--black);color:var(--yellow);border:none;border-radius:6px;padding:10px 22px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);letter-spacing:0.04em;transition:opacity .15s}
+.btn-primary:hover{opacity:.85}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed}
+.btn-secondary{background:transparent;color:var(--black);border:0.5px solid #ccc;border-radius:6px;padding:10px 18px;font-size:13px;cursor:pointer;font-family:var(--font)}
+.btn-secondary:hover{background:var(--gray-light)}
+.btn-save{background:#1a1a1a;color:var(--white);border:none;border-radius:6px;padding:10px 18px;font-size:13px;cursor:pointer;font-family:var(--font)}
+.btn-save:hover{background:#333}
+
+/* ---- PAGE HEADERS ---- */
+.page-header{margin-bottom:24px}
+.page-header h2{font-size:22px;font-weight:700;margin-bottom:4px}
+.page-header p{font-size:13px;color:var(--gray-text)}
+
+/* ---- PROPOSALS LIST ---- */
+.proposals-list{display:flex;flex-direction:column;gap:10px}
+.proposal-item{background:var(--white);border:0.5px solid var(--gray-mid);border-radius:10px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.proposal-item-left h3{font-size:14px;font-weight:600;margin-bottom:2px}
+.proposal-item-left .meta{font-size:12px;color:var(--gray-text)}
+.proposal-item-right{display:flex;gap:8px;flex-shrink:0}
+.badge{display:inline-block;background:var(--gray-light);color:var(--gray-text);font-size:10px;font-weight:600;border-radius:4px;padding:2px 7px;letter-spacing:0.04em;text-transform:uppercase}
+.badge.draft{background:#f0f0f0;color:#888}
+.badge.sent{background:#e8f4fd;color:#2980b9}
+.badge.accepted{background:#eafaf1;color:#27ae60}
+.badge.declined{background:#fdf0ed;color:#e74c3c}
+.btn-icon{background:none;border:0.5px solid #ddd;border-radius:5px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;transition:border-color .15s}
+.btn-icon:hover{border-color:#999}
+.btn-icon.del:hover{border-color:#e74c3c;color:#e74c3c}
+.empty-state{text-align:center;padding:60px 20px;color:var(--gray-text)}
+.empty-state .icon{font-size:36px;margin-bottom:12px;opacity:.4}
+.empty-state p{font-size:14px}
+
+/* ---- ADMIN ---- */
+.admin-grid{display:flex;flex-direction:column;gap:16px}
+.field-list{display:flex;flex-direction:column;gap:8px}
+.field-list-item{display:flex;gap:8px;align-items:center}
+.field-list-item input{flex:1}
+.btn-list-remove{background:none;border:0.5px solid #ddd;border-radius:4px;width:28px;height:28px;cursor:pointer;font-size:13px;color:var(--gray-text);flex-shrink:0}
+.btn-list-remove:hover{border-color:#e74c3c;color:#e74c3c}
+.btn-list-add{background:none;border:0.5px solid #ddd;border-radius:5px;padding:5px 12px;font-size:12px;color:var(--gray-text);cursor:pointer;font-family:var(--font);margin-top:4px}
+.btn-list-add:hover{background:var(--gray-light)}
+.save-banner{display:none;background:#27ae60;color:var(--white);font-size:12px;font-weight:600;border-radius:5px;padding:6px 14px;margin-top:12px}
+
+/* ---- TOAST ---- */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--black);color:var(--white);border-left:3px solid var(--yellow);border-radius:6px;padding:12px 18px;font-size:13px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;max-width:320px}
+.toast.show{opacity:1}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">
+      <svg viewBox="0 0 24 24"><rect x="5" y="8" width="14" height="10" rx="2"/><rect x="9" y="4" width="6" height="4" rx="1"/><circle cx="9" cy="13" r="1.5"/><circle cx="15" cy="13" r="1.5"/><rect x="8" y="18" width="2" height="3" rx="1"/><rect x="14" y="18" width="2" height="3" rx="1"/></svg>
+    </div>
+    <h1>Robot.com Proposals</h1>
+    <p>Enter your team password to continue</p>
+    <input type="password" id="pw-input" placeholder="Password" onkeydown="if(event.key==='Enter')doLogin()">
+    <button onclick="doLogin()">Sign in</button>
+    <div class="login-error" id="login-error">Wrong password. Try again.</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <nav>
+    <div class="nav-logo">
+      <div class="nav-logo-mark">
+        <svg viewBox="0 0 24 24"><rect x="5" y="8" width="14" height="10" rx="2"/><rect x="9" y="4" width="6" height="4" rx="1"/><circle cx="9" cy="13" r="1.5"/><circle cx="15" cy="13" r="1.5"/><rect x="8" y="18" width="2" height="3" rx="1"/><rect x="14" y="18" width="2" height="3" rx="1"/></svg>
+      </div>
+      <span class="nav-brand">ROBOT.COM</span>
+    </div>
+    <div class="nav-tabs">
+      <button class="nav-tab active" onclick="showPage('generator')">New Proposal</button>
+      <button class="nav-tab" onclick="showPage('saved')">Saved Proposals</button>
+      <button class="nav-tab" onclick="showPage('admin')">Admin</button>
+    </div>
+    <button class="nav-logout" onclick="doLogout()">Sign out</button>
+  </nav>
+
+  <!-- GENERATOR PAGE -->
+  <div class="page active" id="page-generator">
+    <div class="page-header">
+      <h2>New Proposal</h2>
+      <p>Fill in the details below, then download as PDF or save.</p>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Client information</div>
+      <div class="grid2" style="margin-bottom:12px">
+        <div class="field"><label>Client name</label><input type="text" id="client-name" placeholder="VarsityGripz" oninput="updateSummary()"></div>
+        <div class="field"><label>Contact person</label><input type="text" id="contact-name" placeholder="Jane Smith" oninput="updateSummary()"></div>
+      </div>
+      <div class="grid3">
+        <div class="field"><label>Email</label><input type="email" id="contact-email" placeholder="jane@acme.com"></div>
+        <div class="field"><label>Phone</label><input type="tel" id="contact-phone" placeholder="+1 555 000 0000"></div>
+        <div class="field"><label>Proposal date</label><input type="date" id="proposal-date"></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Proposal options</div>
+      <div id="options-container"></div>
+      <button class="btn-add-opt" onclick="addOption()">+ Add option</button>
+    </div>
+
+    <div class="summary">
+      <div class="summary-lbl">Summary</div>
+      <div class="summary-row"><span class="summary-key">Client</span><span class="summary-val" id="s-client">--</span></div>
+      <div id="s-options" class="summary-opts"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Notes</div>
+      <div class="field" style="margin-bottom:12px">
+        <label>Internal notes (not shown to client)</label>
+        <textarea id="notes" placeholder="Context, requirements, special conditions..."></textarea>
+      </div>
+      <div class="field">
+        <label>Notes for client</label>
+        <textarea id="client-notes" placeholder="What the client will see in the proposal..."></textarea>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Status</div>
+      <div class="grid2">
+        <div class="field"><label>Status</label>
+          <select id="status">
+            <option>Draft</option><option>Sent</option><option>Under review</option><option>Accepted</option><option>Declined</option>
+          </select>
+        </div>
+        <div class="field"><label>Valid until</label><input type="date" id="expiry-date"></div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn-primary" id="pdf-btn" onclick="downloadPDF()">&#8681; Download PDF</button>
+      <button class="btn-save" onclick="saveProposal()">Save proposal</button>
+      <button class="btn-secondary" onclick="clearForm()">Clear</button>
+    </div>
+  </div>
+
+  <!-- SAVED PAGE -->
+  <div class="page" id="page-saved">
+    <div class="page-header">
+      <h2>Saved Proposals</h2>
+      <p>All proposals saved by your team.</p>
+    </div>
+    <div id="proposals-list-container"></div>
+  </div>
+
+  <!-- ADMIN PAGE -->
+  <div class="page" id="page-admin">
+    <div class="page-header">
+      <h2>Admin Settings</h2>
+      <p>Customize defaults for the proposal generator.</p>
+    </div>
+    <div class="admin-grid">
+      <div class="section">
+        <div class="section-label">Proposal intro text</div>
+        <div class="field">
+          <label>Opening paragraph shown to every client</label>
+          <textarea id="admin-intro" rows="3"></textarea>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-label">Operator note</div>
+        <div class="field">
+          <label>Paragraph about onsite operators (shown in every proposal)</label>
+          <textarea id="admin-operator-note" rows="2"></textarea>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-label">What's included (bullet list)</div>
+        <div class="field-list" id="admin-included-list"></div>
+        <button class="btn-list-add" onclick="addIncludedItem()">+ Add item</button>
+      </div>
+      <div class="section">
+        <div class="section-label">Robot models</div>
+        <div class="field-list" id="admin-models-list"></div>
+        <button class="btn-list-add" onclick="addModel()">+ Add model</button>
+      </div>
+      <div class="section">
+        <div class="section-label">Service tiers</div>
+        <div class="field-list" id="admin-tiers-list"></div>
+        <button class="btn-list-add" onclick="addTier()">+ Add tier</button>
+      </div>
+      <div class="actions">
+        <button class="btn-primary" onclick="saveSettings()">Save settings</button>
+      </div>
+      <div class="save-banner" id="save-banner">Settings saved!</div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let optCount = 0;
+const LABELS = ['A','B','C','D','E'];
+let appSettings = {};
+
+// ---- AUTH ----
+async function doLogin() {
+  const pw = document.getElementById('pw-input').value;
+  const r = await fetch('/api/login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ password: pw }) });
+  if (r.ok) {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    initApp();
+  } else {
+    document.getElementById('login-error').style.display = 'block';
+  }
+}
+
+async function doLogout() {
+  await fetch('/api/logout', { method:'POST' });
+  location.reload();
+}
+
+// ---- INIT ----
+async function initApp() {
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('proposal-date').value = today;
+  await loadSettings();
+  addOption(); addOption();
+  updateSummary();
+}
+
+async function checkAuth() {
+  const r = await fetch('/api/me');
+  const d = await r.json();
+  if (d.authenticated) {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    initApp();
+  }
+}
+checkAuth();
+
+// ---- NAVIGATION ----
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  document.querySelectorAll('.nav-tab').forEach(t => {
+    if (t.textContent.toLowerCase().includes(name === 'generator' ? 'new' : name === 'saved' ? 'saved' : 'admin')) t.classList.add('active');
+  });
+  if (name === 'saved') loadSavedProposals();
+  if (name === 'admin') renderAdminSettings();
+}
+
+// ---- SETTINGS ----
+async function loadSettings() {
+  const r = await fetch('/api/settings');
+  appSettings = await r.json();
+  updateSelectsFromSettings();
+}
+
+function updateSelectsFromSettings() {
+  document.querySelectorAll('[id^="opt-"][id$="-model"]').forEach(sel => populateSelect(sel, appSettings.defaultModels || []));
+  document.querySelectorAll('[id^="opt-"][id$="-tier"]').forEach(sel => populateSelect(sel, appSettings.defaultTiers || []));
+}
+
+function populateSelect(sel, items) {
+  const current = sel.value;
+  sel.innerHTML = '<option value="">Select...</option>' + items.map(i => `<option ${i===current?'selected':''}>${i}</option>`).join('');
+}
+
+// ---- OPTIONS ----
+function addOption() {
+  const idx = optCount++;
+  const label = LABELS[idx] || ('Option ' + (idx + 1));
+  const container = document.getElementById('options-container');
+  const div = document.createElement('div');
+  div.className = 'opt-card';
+  div.id = 'opt-' + idx;
+  const models = (appSettings.defaultModels || ['Kiwi 1.0','Kiwi 2.0','Kiwi Pro','Custom / TBD']).map(m => `<option>${m}</option>`).join('');
+  const tiers = (appSettings.defaultTiers || ['Standard','Premium','Enterprise']).map(t => `<option>${t}</option>`).join('');
+  div.innerHTML = `
+    <div class="opt-header">
+      <span class="opt-badge">Option ${label}</span>
+      ${idx > 0 ? `<button class="btn-remove" onclick="removeOption(${idx})">&#10005; Remove</button>` : ''}
+    </div>
+    <div class="grid3" style="margin-bottom:10px">
+      <div class="field"><label>Robots</label><input type="number" id="opt-${idx}-robots" min="1" placeholder="1" oninput="updateSummary()"></div>
+      <div class="field"><label>Activation days</label><input type="number" id="opt-${idx}-days" min="1" placeholder="30" oninput="updateSummary()"></div>
+      <div class="field"><label>Total price</label><div class="pfx"><span>$</span><input type="number" id="opt-${idx}-price" min="0" step="0.01" placeholder="0.00" oninput="updateSummary()"></div></div>
+    </div>
+    <div class="grid2" style="margin-bottom:10px">
+      <div class="field"><label>Robot model</label><select id="opt-${idx}-model"><option value="">Select...</option>${models}</select></div>
+      <div class="field"><label>Service tier</label><select id="opt-${idx}-tier"><option value="">Select...</option>${tiers}</select></div>
+    </div>
+    <div class="field"><label>Option description</label><textarea id="opt-${idx}-desc" placeholder="What makes this option unique..."></textarea></div>
+  `;
+  container.appendChild(div);
+  updateSummary();
+}
+
+function removeOption(idx) {
+  const el = document.getElementById('opt-' + idx);
+  if (el) el.remove();
+  updateSummary();
+}
+
+function getOptions() {
+  const opts = [];
+  document.querySelectorAll('.opt-card').forEach((card, i) => {
+    const idx = card.id.replace('opt-', '');
+    opts.push({
+      label: LABELS[i] || ('Option ' + (i + 1)),
+      robots: document.getElementById('opt-'+idx+'-robots')?.value || '',
+      days: document.getElementById('opt-'+idx+'-days')?.value || '',
+      price: document.getElementById('opt-'+idx+'-price')?.value || '',
+      model: document.getElementById('opt-'+idx+'-model')?.value || '',
+      tier: document.getElementById('opt-'+idx+'-tier')?.value || '',
+      desc: document.getElementById('opt-'+idx+'-desc')?.value || ''
+    });
+  });
+  return opts;
+}
+
+function fmt(n) { return isNaN(n) || n === '' ? '--' : '$' + Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+
+function updateSummary() {
+  const client = document.getElementById('client-name').value;
+  document.getElementById('s-client').textContent = client || '--';
+  const opts = getOptions();
+  const container = document.getElementById('s-options');
+  container.innerHTML = '';
+  opts.forEach(o => {
+    const price = parseFloat(o.price);
+    const div = document.createElement('div');
+    div.className = 'sopt';
+    div.innerHTML = `
+      <div class="sopt-title">Option ${o.label}</div>
+      <div class="sopt-row"><span class="sopt-key">Robots</span><span class="sopt-val">${o.robots ? o.robots + ' unit' + (o.robots != 1 ? 's' : '') : '--'}</span></div>
+      <div class="sopt-row"><span class="sopt-key">Activation</span><span class="sopt-val">${o.days ? o.days + ' day' + (o.days != 1 ? 's' : '') : '--'}</span></div>
+      ${o.model ? `<div class="sopt-row"><span class="sopt-key">Model</span><span class="sopt-val">${o.model}</span></div>` : ''}
+      ${o.tier ? `<div class="sopt-row"><span class="sopt-key">Tier</span><span class="sopt-val">${o.tier}</span></div>` : ''}
+      <div class="sopt-price">${(!isNaN(price) && price > 0) ? fmt(price) : '--'}</div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function getFormData() {
+  return {
+    clientName: document.getElementById('client-name').value,
+    contactName: document.getElementById('contact-name').value,
+    contactEmail: document.getElementById('contact-email').value,
+    contactPhone: document.getElementById('contact-phone').value,
+    proposalDate: document.getElementById('proposal-date').value,
+    expiryDate: document.getElementById('expiry-date').value,
+    status: document.getElementById('status').value,
+    notes: document.getElementById('notes').value,
+    clientNotes: document.getElementById('client-notes').value,
+    options: getOptions()
+  };
+}
+
+// ---- PDF ----
+async function downloadPDF() {
+  const btn = document.getElementById('pdf-btn');
+  btn.disabled = true;
+  btn.textContent = 'Generating...';
+  try {
+    const data = getFormData();
+    const r = await fetch('/api/generate-pdf', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    if (!r.ok) throw new Error('Server error');
+    const blob = await r.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${data.clientName || 'proposal'}_Robot_Proposal.pdf`.replace(/\s+/g, '_');
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('PDF downloaded!');
+  } catch (e) {
+    showToast('PDF failed: ' + e.message);
+  }
+  btn.disabled = false;
+  btn.textContent = '\u2B07 Download PDF';
+}
+
+// ---- SAVE ----
+async function saveProposal() {
+  const data = getFormData();
+  if (!data.clientName) { showToast('Add a client name first'); return; }
+  const r = await fetch('/api/proposals', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  if (r.ok) showToast('Proposal saved!');
+  else showToast('Save failed');
+}
+
+function clearForm() {
+  document.querySelectorAll('#page-generator input, #page-generator textarea').forEach(el => el.value = '');
+  document.querySelectorAll('#page-generator select').forEach(el => el.selectedIndex = 0);
+  document.getElementById('options-container').innerHTML = '';
+  optCount = 0;
+  addOption(); addOption();
+  updateSummary();
+  document.getElementById('proposal-date').value = new Date().toISOString().split('T')[0];
+}
+
+// ---- SAVED PROPOSALS ----
+async function loadSavedProposals() {
+  const r = await fetch('/api/proposals');
+  const proposals = await r.json();
+  const container = document.getElementById('proposals-list-container');
+  if (!proposals.length) {
+    container.innerHTML = `<div class="empty-state"><div class="icon">&#128196;</div><p>No proposals saved yet. Create one from the New Proposal tab.</p></div>`;
+    return;
+  }
+  container.innerHTML = `<div class="proposals-list">${proposals.map(p => {
+    const date = new Date(p.createdAt).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+    const optSummary = (p.options || []).map(o => `Option ${o.label}: ${o.robots || '?'} robots, $${o.price ? Number(o.price).toLocaleString() : '?'}`).join(' &nbsp;|&nbsp; ');
+    const badgeClass = (p.status || 'draft').toLowerCase().replace(/\s/g,'-');
+    return `
+      <div class="proposal-item">
+        <div class="proposal-item-left">
+          <h3>${p.clientName || 'Unnamed client'} ${p.contactName ? '&mdash; ' + p.contactName : ''}</h3>
+          <div class="meta">${date} &nbsp;&bull;&nbsp; ${optSummary || 'No options'}</div>
+        </div>
+        <div class="proposal-item-right">
+          <span class="badge ${badgeClass}">${p.status || 'Draft'}</span>
+          <button class="btn-icon" title="Load into editor" onclick="loadProposal('${p.id}')">&#9998;</button>
+          <button class="btn-icon del" title="Delete" onclick="deleteProposal('${p.id}')">&#10005;</button>
+        </div>
+      </div>
+    `;
+  }).join('')}</div>`;
+}
+
+async function deleteProposal(id) {
+  if (!confirm('Delete this proposal?')) return;
+  await fetch('/api/proposals/' + id, { method: 'DELETE' });
+  loadSavedProposals();
+  showToast('Proposal deleted');
+}
+
+async function loadProposal(id) {
+  const r = await fetch('/api/proposals');
+  const proposals = await r.json();
+  const p = proposals.find(x => x.id === id);
+  if (!p) return;
+  clearForm();
+  document.getElementById('client-name').value = p.clientName || '';
+  document.getElementById('contact-name').value = p.contactName || '';
+  document.getElementById('contact-email').value = p.contactEmail || '';
+  document.getElementById('contact-phone').value = p.contactPhone || '';
+  document.getElementById('proposal-date').value = p.proposalDate || '';
+  document.getElementById('expiry-date').value = p.expiryDate || '';
+  document.getElementById('status').value = p.status || 'Draft';
+  document.getElementById('notes').value = p.notes || '';
+  document.getElementById('client-notes').value = p.clientNotes || '';
+  document.getElementById('options-container').innerHTML = '';
+  optCount = 0;
+  (p.options || []).forEach(o => {
+    addOption();
+    const idx = optCount - 1;
+    document.getElementById('opt-'+idx+'-robots').value = o.robots || '';
+    document.getElementById('opt-'+idx+'-days').value = o.days || '';
+    document.getElementById('opt-'+idx+'-price').value = o.price || '';
+    document.getElementById('opt-'+idx+'-model').value = o.model || '';
+    document.getElementById('opt-'+idx+'-tier').value = o.tier || '';
+    document.getElementById('opt-'+idx+'-desc').value = o.desc || '';
+  });
+  updateSummary();
+  showPage('generator');
+  showToast('Proposal loaded into editor');
+}
+
+// ---- ADMIN ----
+async function renderAdminSettings() {
+  const r = await fetch('/api/settings');
+  appSettings = await r.json();
+  document.getElementById('admin-intro').value = appSettings.proposalIntro || '';
+  document.getElementById('admin-operator-note').value = appSettings.operatorNote || '';
+  renderListEditor('admin-included-list', appSettings.includedItems || [], 'included');
+  renderListEditor('admin-models-list', appSettings.defaultModels || [], 'model');
+  renderListEditor('admin-tiers-list', appSettings.defaultTiers || [], 'tier');
+}
+
+function renderListEditor(containerId, items, type) {
+  const el = document.getElementById(containerId);
+  el.innerHTML = items.map((item, i) => `
+    <div class="field-list-item">
+      <input type="text" value="${item.replace(/"/g,'&quot;')}" id="${type}-item-${i}">
+      <button class="btn-list-remove" onclick="removeListItem('${containerId}','${type}',${i})">&#10005;</button>
+    </div>
+  `).join('');
+}
+
+function removeListItem(containerId, type, idx) {
+  const el = document.getElementById(`${type}-item-${idx}`);
+  if (el) el.closest('.field-list-item').remove();
+}
+
+function addIncludedItem() {
+  const el = document.getElementById('admin-included-list');
+  const idx = el.querySelectorAll('.field-list-item').length;
+  el.insertAdjacentHTML('beforeend', `<div class="field-list-item"><input type="text" id="included-item-${idx}" placeholder="New item..."><button class="btn-list-remove" onclick="this.closest('.field-list-item').remove()">&#10005;</button></div>`);
+}
+function addModel() {
+  const el = document.getElementById('admin-models-list');
+  const idx = el.querySelectorAll('.field-list-item').length;
+  el.insertAdjacentHTML('beforeend', `<div class="field-list-item"><input type="text" id="model-item-${idx}" placeholder="New model..."><button class="btn-list-remove" onclick="this.closest('.field-list-item').remove()">&#10005;</button></div>`);
+}
+function addTier() {
+  const el = document.getElementById('admin-tiers-list');
+  const idx = el.querySelectorAll('.field-list-item').length;
+  el.insertAdjacentHTML('beforeend', `<div class="field-list-item"><input type="text" id="tier-item-${idx}" placeholder="New tier..."><button class="btn-list-remove" onclick="this.closest('.field-list-item').remove()">&#10005;</button></div>`);
+}
+
+async function saveSettings() {
+  const collectList = (containerId) =>
+    Array.from(document.getElementById(containerId).querySelectorAll('input')).map(i => i.value.trim()).filter(Boolean);
+  const settings = {
+    proposalIntro: document.getElementById('admin-intro').value,
+    operatorNote: document.getElementById('admin-operator-note').value,
+    includedItems: collectList('admin-included-list'),
+    defaultModels: collectList('admin-models-list'),
+    defaultTiers: collectList('admin-tiers-list')
+  };
+  const r = await fetch('/api/settings', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(settings) });
+  if (r.ok) {
+    appSettings = settings;
+    showToast('Settings saved!');
+    updateSelectsFromSettings();
+  }
+}
+
+// ---- TOAST ----
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+</script>
+</body>
+</html>
